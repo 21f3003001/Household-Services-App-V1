@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<h2>Admin Dashboard</h2>
+
+<h4>Manage Services</h4>
+<a href="/admin/service/new" class="btn btn-success">Create New Service</a>
+
+<table class="table mt-4">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Service Name</th>
+            <th>Base Price</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for service in services %}
+        <tr>
+            <td>{{ service.id }}</td>
+            <td>{{ service.name }}</td>
+            <td>{{ service.price }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h4>Manage Professionals</h4>
+<table class="table mt-4">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Role</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for professional in professionals %}
+        <tr>
+            <td>{{ professional.id }}</td>
+            <td>{{ professional.username }}</td>
+            <td>{{ professional.role }}</td>
+            <td>
+                <!-- Admin can review/block/unblock professionals here -->
+                <a href="#" class="btn btn-danger">Block</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
