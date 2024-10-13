@@ -2,11 +2,13 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 from models import db, User, Service, ServiceRequest
 from werkzeug.security import generate_password_hash, check_password_hash
 
+
 # Create a Blueprint for routes
 main = Blueprint('main', __name__)
 
 # User roles: Admin, Service Professional, Customer
 roles = ['admin', 'professional', 'customer']
+
 
 @main.route('/')
 def index():
@@ -34,10 +36,11 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
-        flash("Registration successful! You can now log in.", "success")
-        return redirect(url_for('main.login'))
+        # Display success message without using flash
+        return render_template('register.html', success_message="Registration successful! You can now log in.")
     
     return render_template('register.html')
+
 
 # Login Route for Users (Admin/Professional/Customer)
 @main.route('/login', methods=['GET', 'POST'])
@@ -45,30 +48,57 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        role = request.form['role']
+        
         user = User.query.filter_by(username=username).first()
 
         if user and check_password_hash(user.password, password):
-            session['user_id'] = user.id
-            session['role'] = user.role
+            if user.role == role:
+                session['user_id'] = user.id
+                session['role'] = user.role
 
-            if user.role == 'admin':
-                return redirect(url_for('main.admin_dashboard'))
-            elif user.role == 'professional':
-                return redirect(url_for('main.professional_dashboard'))
-            elif user.role == 'customer':
-                return redirect(url_for('main.customer_dashboard'))
+                if user.role == 'admin':
+                    return redirect(url_for('main.admin_dashboard'))
+                elif user.role == 'professional':
+                    return redirect(url_for('main.professional_dashboard'))
+                elif user.role == 'customer':
+                    return redirect(url_for('main.customer_dashboard'))
+            else:
+                flash("Role mismatch. Please select the correct role.", "danger")
         else:
             flash("Invalid credentials. Please try again.", "danger")
     
     return render_template('login.html')
 
-# Admin Dashboard
+
+@main.route('/logout')
+def logout():
+    # Remove user session
+    session.pop('user_id', None)
+    session.pop('role', None)
+    return redirect(url_for('main.login'))
+
+# Admin Dashboard Route
 @main.route('/admin/dashboard')
 def admin_dashboard():
     if session.get('role') == 'admin':
+        return render_template('admin_panel/admin_dashboard.html')
+    return redirect(url_for('main.login'))
+
+# Service Professional Dashboard
+@main.route('/professional/dashboard')
+def professional_dashboard():
+    if session.get('role') == 'professional':
+        requests = ServiceRequest.query.filter_by(professional_id=session['user_id']).all()
+        return render_template('professional_dashboard.html', requests=requests)
+    return redirect(url_for('main.login'))
+
+# Customer Dashboard
+@main.route('/customer/dashboard')
+def customer_dashboard():
+    if session.get('role') == 'customer':
         services = Service.query.all()
-        professionals = User.query.filter_by(role='professional').all()
-        return render_template('admin_dashboard.html', services=services, professionals=professionals)
+        return render_template('customer_dashboard.html', services=services)
     return redirect(url_for('main.login'))
 
 # Admin: Create a new service
@@ -83,22 +113,6 @@ def create_service():
             db.session.commit()
             return redirect(url_for('main.admin_dashboard'))
         return render_template('service_form.html')
-    return redirect(url_for('main.login'))
-
-# Service Professional Dashboard
-@main.route('/professional/dashboard')
-def professional_dashboard():
-    if session.get('role') == 'professional':
-        requests = ServiceRequest.query.filter_by(professional_id=session['user_id']).all()
-        return render_template('professional_dashboard.html', requests=requests)
-    return redirect(url_for('main.login'))
-
-# Customer Dashboard - View services and create service request
-@main.route('/customer/dashboard')
-def customer_dashboard():
-    if session.get('role') == 'customer':
-        services = Service.query.all()
-        return render_template('customer_dashboard.html', services=services)
     return redirect(url_for('main.login'))
 
 # Customer: Create a service request

@@ -1,17 +1,4 @@
-from flask import Flask
-from models import db, User
-from routes import main  # Import the existing routes module
-from admin_routes import admin_bp  # Import the new admin routes module
-from werkzeug.security import generate_password_hash
-
-
-app = Flask(__name__)
-app.secret_key = 'your_secret_key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///services.db'
-db.init_app(app)
-
-
-# # Create or overwrite the admin user
+# Create or overwrite the admin user
 # with app.app_context():
 #     db.create_all()  # Ensure tables are created
 
@@ -32,16 +19,3 @@ db.init_app(app)
 
 #     # Commit the changes
 #     db.session.commit()
-
-
-
-# Register the blueprints
-app.register_blueprint(main)
-app.register_blueprint(admin_bp)
-
-if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-    app.run(debug=True)
-
-
