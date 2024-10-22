@@ -3,48 +3,32 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-4">
-        <h2 class="text-center">Login</h2>
-
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg p-4">
+                <h2 class="text-center mb-4">Login</h2>
+                <form action="{{ url_for('main.login') }}" method="POST">
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" required>
                     </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
-        <form method="POST" action="/login">
-            <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" class="form-control" id="username" name="username" required>
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Login</button>
+                </form>
+                <div class="text-center mt-3">
+                    <p>Don't have an account? <a href="{{ url_for('main.register') }}" class="text-info">Register here</a></p>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" class="form-control" id="password" name="password" required>
-            </div>
-            <div class="form-group">
-                <label for="role">Login as:</label>
-                <select class="form-control" id="role" name="role" required>
-                    <option value="" disabled selected>Select your role</option>
-                    <option value="customer">Customer</option>
-                    <option value="professional">Service Professional</option>
-                    <option value="admin">Admin</option>
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary btn-block">Login</button>
-        </form>
-
-        <!-- Registration Link -->
-        <div class="mt-3 text-center">
-            <p>Don't have an account? <a href="/register">Register here</a></p>
         </div>
     </div>
 </div>
+
+<!-- Footer Section -->
+<footer class="text-center mt-5 py-4" style="background-color: #343a40; color: white;">
+    <p>© 2024 Household Services. All rights reserved.</p>
+</footer>
 {% endblock %}

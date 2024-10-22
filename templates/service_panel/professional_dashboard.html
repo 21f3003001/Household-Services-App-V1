@@ -1,0 +1,33 @@
+<h2>Professional Dashboard</h2>
+<h3>Assigned Service Requests</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Customer Name</th>
+            <th>Service</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for request in service_requests %}
+        <tr>
+            <td>{{ request.id }}</td>
+            <td>{{ request.customer.name }}</td>
+            <td>{{ request.service.name }}</td>
+            <td>{{ request.status }}</td>
+            <td>
+                {% if request.status == 'requested' %}
+                <form action="{{ url_for('professional.handle_request', request_id=request.id, action='accept') }}" method="POST">
+                    <button type="submit" class="btn btn-success">Accept</button>
+                </form>
+                <form action="{{ url_for('professional.handle_request', request_id=request.id, action='reject') }}" method="POST">
+                    <button type="submit" class="btn btn-danger">Reject</button>
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

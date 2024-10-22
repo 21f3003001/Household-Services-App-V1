@@ -1,19 +1,14 @@
-{% extends "base.html" %}
-
-{% block title %}Admin Dashboard{% endblock %}
-
-{% block content %}
 <h2>Admin Dashboard</h2>
-<br>
-<h4>Manage Services</h4>
-<a href="/admin/service/new" class="btn btn-success">Create New Service</a>
 
-<table class="table mt-4">
+<h3>Manage Services</h3>
+<a href="{{ url_for('admin.create_service') }}" class="btn btn-primary">Create New Service</a>
+<table class="table">
     <thead>
         <tr>
             <th>ID</th>
             <th>Service Name</th>
             <th>Base Price</th>
+            <th>Description</th>
         </tr>
     </thead>
     <tbody>
@@ -22,19 +17,20 @@
             <td>{{ service.id }}</td>
             <td>{{ service.name }}</td>
             <td>{{ service.price }}</td>
+            <td>{{ service.description }}</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 
-<h4>Manage Professionals</h4>
-<a href="/admin/professional/new" class="btn btn-success">Add New Professional</a>
-<table class="table mt-4">
+<h3>Manage Professionals</h3>
+<table class="table">
     <thead>
         <tr>
             <th>ID</th>
             <th>Name</th>
-            <th>Role</th>
+            <th>Service Type</th>
+            <th>Approval Status</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -42,24 +38,31 @@
         {% for professional in professionals %}
         <tr>
             <td>{{ professional.id }}</td>
-            <td>{{ professional.username }}</td>
-            <td>{{ professional.role }}</td>
+            <td>{{ professional.name }}</td>
+            <td>{{ professional.service_type }}</td>
+            <td>{{ 'Approved' if professional.is_approved else 'Pending' }}</td>
             <td>
-                <a href="/admin/professional/remove/{{ professional.id }}" class="btn btn-danger" onclick="return confirm('Are you sure you want to remove this professional?');">Remove</a>
+                {% if not professional.is_approved %}
+                <form action="{{ url_for('admin.approve_professional', professional_id=professional.id) }}" method="POST">
+                    <button type="submit" class="btn btn-success">Approve</button>
+                </form>
+                {% endif %}
+                <form action="{{ url_for('admin.block_user', user_type='professional', user_id=professional.id) }}" method="POST">
+                    <button type="submit" class="btn btn-danger">Block</button>
+                </form>
             </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 
-<h4>Manage Customers</h4>
-<a href="/admin/customer/new" class="btn btn-success">Add New Customer</a>
-<table class="table mt-4">
+<h3>Manage Customers</h3>
+<table class="table">
     <thead>
         <tr>
             <th>ID</th>
             <th>Name</th>
-            <th>Role</th>
+            <th>Status</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -67,13 +70,14 @@
         {% for customer in customers %}
         <tr>
             <td>{{ customer.id }}</td>
-            <td>{{ customer.username }}</td>
-            <td>{{ customer.role }}</td>
+            <td>{{ customer.name }}</td>
+            <td>{{ 'Blocked' if customer.is_blocked else 'Active' }}</td>
             <td>
-                <a href="/admin/customer/remove/{{ customer.id }}" class="btn btn-danger" onclick="return confirm('Are you sure you want to remove this customer?');">Remove</a>
+                <form action="{{ url_for('admin.block_user', user_type='customer', user_id=customer.id) }}" method="POST">
+                    <button type="submit" class="btn btn-danger">Block</button>
+                </form>
             </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
-{% endblock %}

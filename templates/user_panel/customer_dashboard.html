@@ -1,0 +1,27 @@
+<h2>Customer Dashboard</h2>
+<h3>Available Services</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Service Name</th>
+            <th>Base Price</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for service in services %}
+        <tr>
+            <td>{{ service.id }}</td>
+            <td>{{ service.name }}</td>
+            <td>{{ service.price }}</td>
+            <td>
+                <a href="{{ url_for('customer.create_service_request', service_id=service.id) }}" class="btn btn-primary">Request Service</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h3>Your Service Requests</h3>
+<!-- You can add a section to display customer’s service requests and their statuses -->
