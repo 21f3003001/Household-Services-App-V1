@@ -1,83 +1,105 @@
-<h2>Admin Dashboard</h2>
+{% extends "admin_panel/base.html" %}
 
-<h3>Manage Services</h3>
-<a href="{{ url_for('admin.create_service') }}" class="btn btn-primary">Create New Service</a>
-<table class="table">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Service Name</th>
-            <th>Base Price</th>
-            <th>Description</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for service in services %}
-        <tr>
-            <td>{{ service.id }}</td>
-            <td>{{ service.name }}</td>
-            <td>{{ service.price }}</td>
-            <td>{{ service.description }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+{% block content %}
+<div class="container">
+    <!-- Navigation bar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Welcome to Admin</a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('main.admin_dashboard') }}">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.search') }}">Search</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.summary') }}">Summary</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
 
-<h3>Manage Professionals</h3>
-<table class="table">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Service Type</th>
-            <th>Approval Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for professional in professionals %}
-        <tr>
-            <td>{{ professional.id }}</td>
-            <td>{{ professional.name }}</td>
-            <td>{{ professional.service_type }}</td>
-            <td>{{ 'Approved' if professional.is_approved else 'Pending' }}</td>
-            <td>
-                {% if not professional.is_approved %}
-                <form action="{{ url_for('admin.approve_professional', professional_id=professional.id) }}" method="POST">
-                    <button type="submit" class="btn btn-success">Approve</button>
-                </form>
-                {% endif %}
-                <form action="{{ url_for('admin.block_user', user_type='professional', user_id=professional.id) }}" method="POST">
-                    <button type="submit" class="btn btn-danger">Block</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+    <!-- Home content -->
+    <div class="mt-4">
+        <!-- Services Table -->
+        <h2>Services</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date Created</th>
+                    <th>Service Name</th>
+                    <th>Description</th>
+                    <th>Base Price</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for service in services %}
+                <tr>
+                    <td>{{ service.id }}</td>
+                    <td>{{ service.date_created.strftime('%Y-%m-%d') }}</td>
+                    <td>{{ service.name }}</td>
+                    <td>{{ service.description }}</td>
+                    <td>{{ service.base_price }}</td>
+                    <td>
+                        <a href="{{ url_for('admin.edit_service', service_id=service.service_id) }}" class="btn btn-primary btn-sm">Edit</a>
+                        <a href="{{ url_for('admin.delete_service', service_id=service.service_id) }}" class="btn btn-danger btn-sm">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="{{ url_for('admin.add_service') }}" class="btn btn-success">+ New Service</a>
 
-<h3>Manage Customers</h3>
-<table class="table">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for customer in customers %}
-        <tr>
-            <td>{{ customer.id }}</td>
-            <td>{{ customer.name }}</td>
-            <td>{{ 'Blocked' if customer.is_blocked else 'Active' }}</td>
-            <td>
-                <form action="{{ url_for('admin.block_user', user_type='customer', user_id=customer.id) }}" method="POST">
-                    <button type="submit" class="btn btn-danger">Block</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+        <!-- Professionals Table -->
+        <h2 class="mt-5">Professionals</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Experience (Yrs)</th>
+                    <th>Service Name</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for professional in professionals %}
+                <tr>
+                    <td>{{ professional.id }}</td>
+                    <td>{{ professional.name }}</td>
+                    <td>{{ professional.experience }}</td>
+                    <td>{{ professional.name }}</td>
+                    <td>
+                        <a href="{{ url_for('admin.approve_professional', professional_id=professional.prof_id) }}" class="btn btn-success btn-sm">Approve</a>
+                        <a href="{{ url_for('admin.reject_professional', professional_id=professional.prof_id) }}" class="btn btn-warning btn-sm">Reject</a>
+                        <a href="{{ url_for('admin.delete_professional', professional_id=professional.prof_id) }}" class="btn btn-danger btn-sm">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="{{ url_for('admin.add_professional') }}" class="btn btn-success">+ New Professional</a>
+
+        <!-- Service Requests Table -->
+        <h2 class="mt-5">Service Requests</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Assigned Professional</th>
+                    <th>Requested Date</th>
+                    <th>Status (R/A/C)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in service_requests %}
+                <tr>
+                    <td>{{ request.id }}</td>
+                    <td>{{ request.assigned_professional_name }}</td>
+                    <td>{{ request.requested_date }}</td>
+                    <td>{{ request.status }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

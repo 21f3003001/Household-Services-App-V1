@@ -1,0 +1,47 @@
+{% extends "admin_panel/base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>Add New Professional</h1>
+    <form method="POST">
+        <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input type="text" class="form-control" id="username" name="username" required>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+        <div class="mb-3">
+            <label for="name" class="form-label">Full Name</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <div class="mb-3">
+            <label for="service_type" class="form-label">Service Type</label>
+            <input type="text" class="form-control" id="service_type" name="service_type" required>
+        </div>
+        <div class="mb-3">
+            <label for="experience" class="form-label">Experience (in years)</label>
+            <input type="number" class="form-control" id="experience" name="experience" min="0" required>
+        </div>
+        <div class="mb-3">
+            <label for="address" class="form-label">Address</label>
+            <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="contact" class="form-label">Contact Number</label>
+            <input type="tel" class="form-control" id="contact" name="contact" pattern="[0-9]{10}" required>
+        </div>
+        <div class="mb-3">
+            <label for="pincode" class="form-label">Pincode</label>
+            <input type="text" class="form-control" id="pincode" name="pincode" pattern="[0-9]{6}" required>
+        </div>
+        <div class="mb-3">
+            <label for="date_created" class="form-label">Date Created</label>
+            <input type="date" class="form-control" id="date_created" name="date_created" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Professional</button>
+        <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+    </form>
+</div>
+{% endblock %}

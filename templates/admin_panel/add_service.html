@@ -1,0 +1,39 @@
+{% extends "admin_panel/base.html" %}
+
+{% block content %}
+<h2 class="mb-4">Add New Service</h2>
+
+<!-- Flash messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}" role="alert">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<form method="POST" action="{{ url_for('admin.add_service') }}" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label for="name" class="form-label">Service Name</label>
+        <input type="text" class="form-control" id="name" name="name" placeholder="Enter service name" required>
+    </div>
+    <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea class="form-control" id="description" name="description" rows="3" placeholder="Enter service description" required></textarea>
+    </div>
+    <div class="mb-3">
+        <label for="base_price" class="form-label">Base Price</label>
+        <input type="number" class="form-control" id="base_price" name="base_price" step="0.01" min="0" placeholder="Enter base price" required>
+    </div>
+    <div class="mb-3">
+        <label for="image" class="form-label">Upload Service Image</label>
+        <input type="file" class="form-control" id="image" name="image" accept=".png, .jpg, .jpeg, .gif" required>
+        <small class="form-text text-muted">Accepted formats: PNG, JPG, JPEG, GIF</small>
+    </div>
+    <button type="submit" class="btn btn-primary">Add Service</button>
+    <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+</form>
+
+{% endblock %}

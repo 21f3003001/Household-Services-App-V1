@@ -1,4 +1,4 @@
-# Create or overwrite the admin user
+# # Create or overwrite the admin user
 # with app.app_context():
 #     db.create_all()  # Ensure tables are created
 

@@ -3,11 +3,41 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('main.homepage') }}">Household Services</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('main.homepage') }}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('main.register') }}">Register</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="card shadow-lg p-4">
+            <div class="card">
                 <h2 class="text-center mb-4">Login</h2>
+
+                <!-- Flash messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    {% for category, message in messages %}
+                      <div class="alert alert-{{ category }} text-center" role="alert">
+                        {{ message }}
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                {% endwith %}
+
                 <form action="{{ url_for('main.login') }}" method="POST">
                     <div class="form-group">
                         <label for="username">Username:</label>
@@ -17,18 +47,27 @@
                         <label for="password">Password:</label>
                         <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-block">Login</button>
+                    <div class="form-group">
+                        <label for="role">Select Role:</label>
+                        <select class="form-select" id="role" name="role" required>
+                            <option value="customer">Customer</option>
+                            <option value="service_professional">Service Professional</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block mt-3">Login</button>
                 </form>
                 <div class="text-center mt-3">
                     <p>Don't have an account? <a href="{{ url_for('main.register') }}" class="text-info">Register here</a></p>
                 </div>
+               
             </div>
         </div>
     </div>
 </div>
 
 <!-- Footer Section -->
-<footer class="text-center mt-5 py-4" style="background-color: #343a40; color: white;">
+<footer>
     <p>© 2024 Household Services. All rights reserved.</p>
 </footer>
 {% endblock %}
