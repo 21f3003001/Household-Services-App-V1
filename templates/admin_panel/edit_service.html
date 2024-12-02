@@ -1,0 +1,85 @@
+{% extends "admin_panel/base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>Edit Service</h1>
+    <form method="POST" enctype="multipart/form-data">
+        <!-- Dropdown for existing service types -->
+        <div class="mb-3">
+            <label for="name" class="form-label">Service Type</label>
+            <select class="form-control" id="name" name="name">
+                <option value="" disabled>Select a Service Type</option>
+                <option value="Cleaning Services">Cleaning Services</option>
+                <option value="Plumbing Services">Plumbing Services</option>
+                <option value="Electrical Services">Electrical Services</option>
+                <option value="Carpentry Services">Carpentry Services</option>
+                <option value="Painting Services">Painting Services</option>
+                <option value="Appliance Repair">Appliance Repair</option>
+                <option value="Pest Control">Pest Control</option>
+                <option value="Home Security Services">Home Security Services</option>
+                <option value="Gardening/Landscaping">Gardening/Landscaping</option>
+                {% for existing_service in services %}
+                    <option value="{{ existing_service.name }}" 
+                        {% if service.name == existing_service.name %} selected {% endif %}>
+                        {{ existing_service.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Input field to add a new service type -->
+        <div class="mb-3">
+            <label for="new_service_type" class="form-label">Add New Service Type (Optional)</label>
+            <input 
+                type="text" 
+                class="form-control" 
+                id="new_service_type" 
+                name="new_service_type" 
+                placeholder="Enter a new service type (if not in dropdown)">
+            <small class="form-text text-muted">
+                If you want to add a new service type, enter it here. This will override the dropdown selection.
+            </small>
+        </div>
+
+        <!-- Service Description -->
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea 
+                class="form-control" 
+                id="description" 
+                name="description" 
+                rows="3" 
+                required>{{ service.description }}</textarea>
+        </div>
+
+        <!-- Base Price -->
+        <div class="mb-3">
+            <label for="base_price" class="form-label">Base Price</label>
+            <input 
+                type="number" 
+                class="form-control" 
+                id="base_price" 
+                name="base_price" 
+                step="0.01" 
+                min="0" 
+                value="{{ service.base_price }}" 
+                required>
+        </div>
+
+        <!-- Upload Service Image -->
+        <div class="mb-3">
+            <label for="image" class="form-label">Upload Image (optional)</label>
+            <input 
+                type="file" 
+                class="form-control" 
+                id="image" 
+                name="image">
+            <small class="form-text text-muted">Accepted formats: PNG, JPG, JPEG, GIF</small>
+        </div>
+
+        <!-- Submit and Cancel Buttons -->
+        <button type="submit" class="btn btn-primary">Update Service</button>
+        <a href="{{ url_for('admin.home') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

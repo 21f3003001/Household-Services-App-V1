@@ -15,25 +15,79 @@
 {% endwith %}
 
 <form method="POST" action="{{ url_for('admin.add_service') }}" enctype="multipart/form-data">
-    <div class="mb-3">
-        <label for="name" class="form-label">Service Name</label>
-        <input type="text" class="form-control" id="name" name="name" placeholder="Enter service name" required>
-    </div>
-    <div class="mb-3">
-        <label for="description" class="form-label">Description</label>
-        <textarea class="form-control" id="description" name="description" rows="3" placeholder="Enter service description" required></textarea>
-    </div>
-    <div class="mb-3">
-        <label for="base_price" class="form-label">Base Price</label>
-        <input type="number" class="form-control" id="base_price" name="base_price" step="0.01" min="0" placeholder="Enter base price" required>
-    </div>
-    <div class="mb-3">
-        <label for="image" class="form-label">Upload Service Image</label>
-        <input type="file" class="form-control" id="image" name="image" accept=".png, .jpg, .jpeg, .gif" required>
-        <small class="form-text text-muted">Accepted formats: PNG, JPG, JPEG, GIF</small>
-    </div>
-    <button type="submit" class="btn btn-primary">Add Service</button>
-    <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+  <!-- Dropdown for existing service types -->
+  <div class="mb-3">
+      <label for="name" class="form-label">Service Type</label>
+      <select class="form-control" id="name" name="name">
+          <option value="" disabled selected>Select a Service Type</option>
+          <option value="Cleaning Services">Cleaning Services</option>
+          <option value="Plumbing Services">Plumbing Services</option>
+          <option value="Electrical Services">Electrical Services</option>
+          <option value="Carpentry Services">Carpentry Services</option>
+          <option value="Painting Services">Painting Services</option>
+          <option value="Appliance Repair">Appliance Repair</option>
+          <option value="Pest Control">Pest Control</option>
+          <option value="Home Security Services">Home Security Services</option>
+          <option value="Gardening/Landscaping">Gardening/Landscaping</option>
+      </select>
+  </div>
+
+  <!-- Input field to add a new service type -->
+  <div class="mb-3">
+      <label for="new_service_type" class="form-label">Add New Service Type (Optional)</label>
+      <input
+          type="text"
+          class="form-control"
+          id="new_service_type"
+          name="new_service_type"
+          placeholder="Enter a new service type (if not in dropdown)">
+      <small class="form-text text-muted">
+          If you want to add a new service type, enter it here. This will override the dropdown selection.
+      </small>
+  </div>
+
+  <!-- Service Description -->
+  <div class="mb-3">
+      <label for="description" class="form-label">Description</label>
+      <textarea
+          class="form-control"
+          id="description"
+          name="description"
+          rows="3"
+          placeholder="Enter service description"
+          required></textarea>
+  </div>
+
+  <!-- Base Price -->
+  <div class="mb-3">
+      <label for="base_price" class="form-label">Base Price</label>
+      <input
+          type="number"
+          class="form-control"
+          id="base_price"
+          name="base_price"
+          step="0.01"
+          min="0"
+          placeholder="Enter base price"
+          required>
+  </div>
+
+  <!-- Upload Service Image -->
+  <div class="mb-3">
+      <label for="image" class="form-label">Upload Service Image</label>
+      <input
+          type="file"
+          class="form-control"
+          id="image"
+          name="image"
+          accept=".png, .jpg, .jpeg, .gif"
+          required>
+      <small class="form-text text-muted">Accepted formats: PNG, JPG, JPEG, GIF</small>
+  </div>
+
+  <!-- Submit and Cancel Buttons -->
+  <button type="submit" class="btn btn-primary">Add Service</button>
+  <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
 </form>
 
 {% endblock %}

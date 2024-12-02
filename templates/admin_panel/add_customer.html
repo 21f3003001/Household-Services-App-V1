@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container">
-    <h1>Add New Professional</h1>
+    <h1>Add New Customers</h1>
     <form method="POST">
         <div class="mb-3">
             <label for="username" class="form-label">Username</label>
@@ -13,17 +13,10 @@
             <input type="password" class="form-control" id="password" name="password" required>
         </div>
         <div class="mb-3">
-            <label for="name" class="form-label">Full Name</label>
-            <input type="text" class="form-control" id="name" name="name" required>
+            <label for="user_name" class="form-label">Full Name</label>
+            <input type="text" class="form-control" id="user_name" name="user_name" required>
         </div>
-        <div class="mb-3">
-            <label for="service_type" class="form-label">Service Type</label>
-            <input type="text" class="form-control" id="service_type" name="service_type" required>
-        </div>
-        <div class="mb-3">
-            <label for="experience" class="form-label">Experience (in years)</label>
-            <input type="number" class="form-control" id="experience" name="experience" min="0" required>
-        </div>
+        
         <div class="mb-3">
             <label for="address" class="form-label">Address</label>
             <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
@@ -37,10 +30,13 @@
             <input type="text" class="form-control" id="pincode" name="pincode" pattern="[0-9]{6}" required>
         </div>
         <div class="mb-3">
-            <label for="date_created" class="form-label">Date Created</label>
-            <input type="date" class="form-control" id="date_created" name="date_created" required>
+            <label for="role" class="form-label">Role</label>
+            <select class="form-select" id="role" name="role" required>
+                <option value="customer">Customer</option>
+            </select>
         </div>
-        <button type="submit" class="btn btn-primary">Add Professional</button>
+
+        <button type="submit" class="btn btn-primary">Add Customer</button>
         <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
     </form>
 </div>

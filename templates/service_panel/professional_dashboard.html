@@ -1,33 +1,66 @@
-<h2>Professional Dashboard</h2>
-<h3>Assigned Service Requests</h3>
-<table class="table">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Customer Name</th>
-            <th>Service</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for request in service_requests %}
-        <tr>
-            <td>{{ request.id }}</td>
-            <td>{{ request.customer.name }}</td>
-            <td>{{ request.service.name }}</td>
-            <td>{{ request.status }}</td>
-            <td>
-                {% if request.status == 'requested' %}
-                <form action="{{ url_for('professional.handle_request', request_id=request.id, action='accept') }}" method="POST">
-                    <button type="submit" class="btn btn-success">Accept</button>
-                </form>
-                <form action="{{ url_for('professional.handle_request', request_id=request.id, action='reject') }}" method="POST">
-                    <button type="submit" class="btn btn-danger">Reject</button>
-                </form>
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+{% extends "service_panel/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3>Today's Services</h3>
+    {% if today_services %}
+        <table class="table table-bordered">
+            <thead class="table-secondary">
+                <tr>
+                    <th>ID</th>
+                    <th>Customer Name</th>
+                    <th>Contact Phone</th>
+                    <th>Location (with pin code)</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for service in today_services %}
+                <tr>
+                    <td>{{ service.service_id }}</td>
+                    <td>{{ service.user_name }}</td>
+                    <td>{{ service.contact }}</td>
+                    <td>{{ service.location }}</td>
+                    <td>
+                        <a href="/accept/{{ service.service_id }}" class="btn btn-success btn-sm">Accept</a>
+                        <a href="/reject/{{ service.service_id }}" class="btn btn-danger btn-sm">Reject</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No services for today.</p>
+    {% endif %}
+
+    <h3>Closed Services</h3>
+    {% if closed_services %}
+        <table class="table table-bordered">
+            <thead class="table-secondary">
+                <tr>
+                    <th>ID</th>
+                    <th>Customer Name</th>
+                    <th>Contact Phone</th>
+                    <th>Location (with pin code)</th>
+                    <th>Date</th>
+                    <th>Rating</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for service in closed_services %}
+                <tr>
+                    <td>{{ service.id }}</td>
+                    <td>{{ service.customer_name }}</td>
+                    <td>{{ service.contact_phone }}</td>
+                    <td>{{ service.location }}</td>
+                    <td>{{ service.date.strftime('%Y-%m-%d') }}</td>
+                    <td>{{ service.rating or 'N/A' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No closed services found.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "admin_panel/base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>Add New Professional</h1>
+    <form method="POST">
+        <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input type="text" class="form-control" id="username" name="username" required>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+        <div class="mb-3">
+            <label for="prof_name" class="form-label">Full Name</label>
+            <input type="text" class="form-control" id="prof_name" name="prof_name" required>
+        </div>
+        <div class="mb-3">
+            <label for="service_type" class="form-label">Service Type</label>
+            <select class="form-control" id="service_type" name="service_type" required>
+                <option value="" disabled selected>Select a Service Type</option>
+                <option value="Cleaning Services">Cleaning Services</option>
+                <option value="Plumbing Services">Plumbing Services</option>
+                <option value="Electrical Services">Electrical Services</option>
+                <option value="Carpentry Services">Carpentry Services</option>
+                <option value="Painting Services">Painting Services</option>
+                <option value="Appliance Repair">Appliance Repair</option>
+                <option value="Pest Control">Pest Control</option>
+                <option value="Home Security Services">Home Security Services</option>
+                <option value="Gardening/Landscaping">Gardening/Landscaping</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="experience" class="form-label">Experience (in years)</label>
+            <input type="number" class="form-control" id="experience" name="experience" min="0" required>
+        </div>
+        <div class="mb-3">
+            <label for="address" class="form-label">Address</label>
+            <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="contact" class="form-label">Contact Number</label>
+            <input type="tel" class="form-control" id="contact" name="contact" pattern="[0-9]{10}" required>
+        </div>
+        <div class="mb-3">
+            <label for="pincode" class="form-label">Pincode</label>
+            <input type="text" class="form-control" id="pincode" name="pincode" pattern="[0-9]{6}" required>
+        </div>
+        <div class="mb-3">
+            <label for="role" class="form-label">Role</label>
+            <select class="form-select" id="role" name="role" required>
+                <option value="service_professional">Service Professional</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Add Professional</button>
+        <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+    </form>
+</div>
+{% endblock %}

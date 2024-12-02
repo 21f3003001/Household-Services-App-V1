@@ -16,7 +16,8 @@
                         <div class="card-body">
                             <h5 class="card-title">{{ service.name }}</h5>
                             <p class="card-text">{{ service.description }}</p>
-                            <a href="{{ url_for('customer.subcategory', service=service.name|lower) }}" class="btn btn-primary">View Details</a>
+                            <a href="{{ url_for('customer.subcategory', service_id=service.service_id) }}" 
+                               class="btn btn-primary">View Details</a>
                         </div>
                     </div>
                 </div>
@@ -24,43 +25,49 @@
         </div>
     </section>
     
+    
 
-    <!-- Section for Service History -->
+    <!-- Service History Section -->
     <section class="service-history mt-5">
-        <h3>Service History</h3>
+        <h3>Your Service History</h3>
         <table class="table table-bordered">
             <thead>
                 <tr>
                     <th>ID</th>
                     <th>Service Name</th>
-                    <th>Professional</th>
-                    <th>Phone</th>
+                    <th>Professional Name</th>
+                    <th>Contact</th>
                     <th>Status</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                {% for request in service_history %}
+                {% for service_request in service_history %}
                     <tr>
-                        <td>{{ request.id }}</td>
-                        <td>{{ request.service.name }}</td>
-                        <td>{{ request.professional.name }}</td>
-                        <td>{{ request.professional.phone }}</td>
-                        <td>{{ request.status }}</td>
+                        <td>{{ service_request.req_id }}</td>
+                        <td>{{ service_request.service.name }}</td>
+                        <td>{{ service_request.service_professionals.prof_name if service_request.service_professionals else 'N/A' }}</td>
+                        <td>{{ service_request.service_professionals.contact if service_request.service_professionals else 'N/A' }}</td>
+                        <td>{{ service_request.status }}</td>
                         <td>
-                            {% if request.status == 'Closed' %}
+                            {% if service_request.status == 'Closed' %}
                                 Closed
-                            {% elif request.status == 'Requested' %}
-                                <form action="{{ url_for('customer.close_service', request_id=request.id) }}" method="post">
+                            {% elif service_request.status == 'Requested' %}
+                                <form action="{{ url_for('customer.close_service', request_id=service_request.req_id) }}" method="POST">
                                     <button type="submit" class="btn btn-warning">Close?</button>
                                 </form>
                             {% endif %}
-                            <a href="{{ url_for('customer.review_service', request_id=request.id) }}" class="btn btn-secondary">Review</a>
+                            <a href="{{ url_for('customer.review_service', request_id=service_request.req_id) }}" class="btn btn-secondary">Review</a>
                         </td>
                     </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">You have not booked any services yet.</td>
+                    </tr>
                 {% endfor %}
-            </tbody>
+            </tbody>            
         </table>
     </section>
+
 </div>
 {% endblock %}

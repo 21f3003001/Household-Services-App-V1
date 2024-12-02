@@ -46,37 +46,37 @@
             <label for="username" class="form-label">Username</label>
             <input type="text" class="form-control" id="username" name="username" required>
         </div>
-        
+    
         <div class="mb-3">
             <label for="password" class="form-label">Password</label>
             <input type="password" class="form-control" id="password" name="password" required>
         </div>
-        
+    
         <div class="mb-3">
             <label for="confirm_password" class="form-label">Confirm Password</label>
             <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
         </div>
-        
+    
         <div class="mb-3">
-            <label for="name" class="form-label">Full Name</label>
-            <input type="text" class="form-control" id="name" name="name" required>
+            <label for="prof_name" class="form-label">Full Name</label>
+            <input type="text" class="form-control" id="prof_name" name="prof_name" required>
         </div>
-        
+    
         <div class="mb-3">
             <label for="address" class="form-label">Address</label>
             <textarea class="form-control" id="address" name="address" required></textarea>
         </div>
-        
+    
         <div class="mb-3">
             <label for="contact" class="form-label">Contact Number</label>
             <input type="text" class="form-control" id="contact" name="contact" required>
         </div>
-        
+    
         <div class="mb-3">
             <label for="pincode" class="form-label">Pincode</label>
             <input type="text" class="form-control" id="pincode" name="pincode" required>
         </div>
-        
+    
         <div class="mb-3">
             <label for="service_type" class="form-label">Service Type</label>
             <select class="form-control" id="service_type" name="service_type" required>
@@ -90,14 +90,26 @@
                 <option value="Pest Control">Pest Control</option>
                 <option value="Home Security Services">Home Security Services</option>
                 <option value="Gardening/Landscaping">Gardening/Landscaping</option>
+                {% for existing_service in services %}
+                    <option value="{{ existing_service.name }}">
+                        {{ existing_service.name }}
+                    </option>
+                {% endfor %}
             </select>
         </div>
-        
+    
         <div class="mb-3">
             <label for="experience" class="form-label">Experience</label>
             <input type="text" class="form-control" id="experience" name="experience">
         </div>
-        
+    
+        <div class="mb-3">
+            <label for="role" class="form-label">Role</label>
+            <select class="form-select" id="role" name="role" required>
+                <option value="service_professional">Service Professional</option>
+            </select>
+        </div>
+    
         <button type="submit" class="btn btn-primary w-100">Register</button>
     </form>
     

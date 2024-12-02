@@ -17,14 +17,14 @@ def register():
         username = request.form.get('username')
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
-        name = request.form.get('name')
+        user_name = request.form.get('user_name')
         address = request.form.get('address')
         contact = request.form.get('contact')
         pincode = request.form.get('pincode')
         role = request.form.get('role', 'customer')  # Default to 'customer'
 
         # Validate form inputs
-        if not username or not password or not confirm_password or not name or not address or not contact or not pincode:
+        if not username or not password or not confirm_password or not user_name or not address or not contact or not pincode:
             flash('All fields are required.', 'danger')
             return redirect(url_for('main.register'))
         
@@ -45,7 +45,7 @@ def register():
         new_user = User(
             username=username,
             password=hashed_password,
-            name=name,
+            user_name=user_name,
             address=address,
             contact=contact,
             pincode=pincode,
@@ -72,15 +72,16 @@ def prof_register():
         username = request.form.get('username')
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
-        name = request.form.get('name')
+        prof_name = request.form.get('prof_name')
         address = request.form.get('address')
         contact = request.form.get('contact')
         pincode = request.form.get('pincode')
         service_type = request.form.get('service_type')
         experience = request.form.get('experience')
+        role = request.form.get('role', 'service_professional')
 
         # Validate form inputs
-        if not username or not password or not confirm_password or not name or not address or not contact or not pincode or not service_type:
+        if not username or not password or not confirm_password or not prof_name or not address or not contact or not pincode or not service_type:
             flash('All fields except experience are required.', 'danger')
             return redirect(url_for('main.prof_register'))
         
@@ -101,13 +102,14 @@ def prof_register():
         new_professional = ServiceProfessional(
             username=username,
             password=hashed_password,
-            name=name,
+            prof_name=prof_name,
             address=address,
             contact=contact,
             pincode=pincode,
             service_type=service_type,
             experience=experience,
-            date_created=datetime.utcnow()
+            date_created=datetime.utcnow(),
+            role=role
         )
         
         try:
@@ -133,27 +135,49 @@ def login():
         password = request.form.get('password')
         role = request.form.get('role')  # Retrieve selected role
 
-        # Query the database for the user with the selected role
-        user = User.query.filter_by(username=username, role=role).first()
+        # Query the correct table based on role
+        if role == "customer":
+            user = User.query.filter_by(username=username, role="customer").first()
+        elif role == "service_professional":
+            user = ServiceProfessional.query.filter_by(username=username, role="service_professional").first()  # No 'role' column in this table
+        elif role == "admin":
+            user = User.query.filter_by(username=username, role="admin").first()
+        else:
+            flash("Invalid role selected.", "danger")
+            return redirect(url_for('main.login'))
 
         # Check if the user exists and the password matches
         if user and check_password_hash(user.password, password):
-            session['user_id'] = user.user_id
+            # Check if the user is blocked (for 'customer' and 'admin' roles only)
+            if role in ["customer", "admin"] and user.status == "Blocked":
+                flash("Your account has been blocked. Please contact support.", "danger")
+                return redirect(url_for('main.login'))
+
+            # Store user details in session
+            if role == "customer" or role == "admin":
+                # For 'User' table roles
+                session['user_id'] = user.user_id
+                session['username'] = user.username
+                session['role'] = role
+            elif role == "service_professional":
+                # For 'ServiceProfessional' table
+                session['prof_id'] = user.prof_id
+                session['username'] = user.username
+                session['role'] = role
 
             # Redirect based on user role
-            if user.role == "customer":
+            if role == "customer":
                 return redirect(url_for('main.customer_dashboard'))
-            elif user.role == "service_professional":
+            elif role == "service_professional":
                 return redirect(url_for('main.professional_dashboard'))
-            elif user.role == "admin":
-                return redirect(url_for('main.admin_dashboard'))  # Add an admin dashboard route if not already done
+            elif role == "admin":
+                return redirect(url_for('main.admin_dashboard'))
 
-        else:
-            flash("Invalid username, password, or role.", "danger")
-            return redirect(url_for('main.login'))
+        # Invalid credentials
+        flash("Invalid username, password, or role.", "danger")
+        return redirect(url_for('main.login'))
 
     return render_template('login.html')
-
 
 @main.route('/customer_dashboard')
 def customer_dashboard():
@@ -162,7 +186,9 @@ def customer_dashboard():
 
 @main.route('/professional_dashboard')
 def professional_dashboard():
-    return render_template('service_panel/professional_dashboard.html')
+    services = Service.query.all()
+    return render_template('service_panel/professional_dashboard.html', services=services)
+
 
 @main.route('/admin_dashboard')
 def admin_dashboard():

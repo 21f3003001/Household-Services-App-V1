@@ -3,7 +3,7 @@ from routes import main
 from admin_routes import admin_bp
 from models import db, User
 from werkzeug.security import generate_password_hash
-
+from professional_routes import professional_bp
 from customer_routes import customer_bp
 from auth_routes import auth_bp
 from flask_login import LoginManager
@@ -66,6 +66,7 @@ app.register_blueprint(main)
 app.register_blueprint(admin_bp)
 app.register_blueprint(customer_bp)
 app.register_blueprint(auth_bp)
+app.register_blueprint(professional_bp)
 
 if __name__ == "__main__":
     with app.app_context():

@@ -2,9 +2,12 @@
 
 {% block content %}
 <div class="container">
-    <!-- Navigation bar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">Welcome to Admin</a>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+        <a class="navbar-brand" href="#">Admin Dashboard</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item"><a class="nav-link" href="{{ url_for('main.admin_dashboard') }}">Home</a></li>
@@ -15,10 +18,26 @@
         </div>
     </nav>
 
-    <!-- Home content -->
-    <div class="mt-4">
-        <!-- Services Table -->
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="alert-container">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Services Section -->
+    <div class="mb-5">
         <h2>Services</h2>
+        <a href="{{ url_for('admin.add_service') }}" class="btn btn-success mb-3">+ Add New Service</a>
         <table class="table table-bordered">
             <thead>
                 <tr>
@@ -27,17 +46,17 @@
                     <th>Service Name</th>
                     <th>Description</th>
                     <th>Base Price</th>
-                    <th>Action</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for service in services %}
                 <tr>
-                    <td>{{ service.id }}</td>
+                    <td>{{ service.service_id }}</td>
                     <td>{{ service.date_created.strftime('%Y-%m-%d') }}</td>
                     <td>{{ service.name }}</td>
                     <td>{{ service.description }}</td>
-                    <td>{{ service.base_price }}</td>
+                    <td>${{ service.base_price }}</td>
                     <td>
                         <a href="{{ url_for('admin.edit_service', service_id=service.service_id) }}" class="btn btn-primary btn-sm">Edit</a>
                         <a href="{{ url_for('admin.delete_service', service_id=service.service_id) }}" class="btn btn-danger btn-sm">Delete</a>
@@ -46,55 +65,123 @@
                 {% endfor %}
             </tbody>
         </table>
-        <a href="{{ url_for('admin.add_service') }}" class="btn btn-success">+ New Service</a>
+    </div>
 
-        <!-- Professionals Table -->
-        <h2 class="mt-5">Professionals</h2>
+    <!-- Professionals Section -->
+    <div class="mb-5">
+        <h2>Professionals</h2>
+        <a href="{{ url_for('admin.add_professional') }}" class="btn btn-success mb-3">+ Add New Professional</a>
         <table class="table table-bordered">
             <thead>
                 <tr>
                     <th>ID</th>
+                    <th>Date Created</th>
                     <th>Name</th>
-                    <th>Experience (Yrs)</th>
+                    <th>Experience (Years)</th>
                     <th>Service Name</th>
-                    <th>Action</th>
+                    <th>Status</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for professional in professionals %}
                 <tr>
-                    <td>{{ professional.id }}</td>
-                    <td>{{ professional.name }}</td>
-                    <td>{{ professional.experience }}</td>
-                    <td>{{ professional.name }}</td>
+                    <td>{{ professional.prof_id }}</td>
+                    <td>{{ professional.date_created.strftime('%Y-%m-%d') if professional.date_created else 'N/A' }}</td>
+                    <td>{{ professional.prof_name }}</td>
+                    <td>{{ professional.experience or 'N/A' }}</td>
+                    <td>{{ professional.service_type }}</td>
                     <td>
-                        <a href="{{ url_for('admin.approve_professional', professional_id=professional.prof_id) }}" class="btn btn-success btn-sm">Approve</a>
-                        <a href="{{ url_for('admin.reject_professional', professional_id=professional.prof_id) }}" class="btn btn-warning btn-sm">Reject</a>
+                        {% if professional.status == 'PENDING' %}
+                            <span class="badge bg-warning">Pending</span>
+                        {% elif professional.status == 'APPROVED' %}
+                            <span class="badge bg-success">Approved</span>
+                        {% elif professional.status == 'REJECTED' %}
+                            <span class="badge bg-danger">Rejected</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if professional.status == 'PENDING' %}
+                            <a href="{{ url_for('admin.approve_professional', professional_id=professional.prof_id) }}" class="btn btn-success btn-sm">Approve</a>
+                            <a href="{{ url_for('admin.reject_professional', professional_id=professional.prof_id) }}" class="btn btn-warning btn-sm">Reject</a>
+                        {% endif %}
                         <a href="{{ url_for('admin.delete_professional', professional_id=professional.prof_id) }}" class="btn btn-danger btn-sm">Delete</a>
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-        <a href="{{ url_for('admin.add_professional') }}" class="btn btn-success">+ New Professional</a>
+    </div>
+    
 
-        <!-- Service Requests Table -->
-        <h2 class="mt-5">Service Requests</h2>
+    <!-- Customer Section -->
+    <div class="mb-5">
+        <h2>Customers</h2>
+        <a href="{{ url_for('admin.add_customer') }}" class="btn btn-success mb-3">+ Add New Customer</a>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date Created</th>
+                    <th>Name</th>
+                    <th>Contact</th>
+                    <th>Location</th>
+                    <th>Pincode</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for customer in customers %}
+                <tr>
+                    <td>{{ customer.user_id }}</td>
+                    <td>{{ customer.date_created.strftime('%Y-%m-%d') if customer.date_created else 'N/A' }}</td>
+                    <td>{{ customer.user_name }}</td>
+                    <td>{{ customer.contact }}</td>
+                    <td>{{ customer.address }}</td>
+                    <td>{{ customer.pincode }}</td>
+                    <td>{{ customer.status }}</td>
+                    <!-- <td>
+                        {% if customer.status == 'PENDING' %}
+                            <span class="badge bg-warning">Pending</span>
+                        {% elif customer.status == 'APPROVED' %}
+                            <span class="badge bg-success">Approved</span>
+                        {% elif customer.status == 'REJECTED' %}
+                            <span class="badge bg-danger">Rejected</span>
+                        {% endif %}
+                    </td> -->
+                    <td>
+                        {% if customer.status == 'Active' %}
+                            <a href="{{ url_for('admin.block_customer', customer_id=customer.user_id) }}" class="btn btn-success btn-sm">Block</a>
+                        {% else %}
+                            <a href="{{ url_for('admin.unblock_customer', customer_id=customer.user_id) }}" class="btn btn-success btn-sm">Unblock</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+    <!-- Service Requests Section -->
+    <div>
+        <h2>Service Requests</h2>
         <table class="table table-bordered">
             <thead>
                 <tr>
                     <th>ID</th>
                     <th>Assigned Professional</th>
                     <th>Requested Date</th>
-                    <th>Status (R/A/C)</th>
+                    <th>Status (Requested/Accepted/Completed)</th>
                 </tr>
             </thead>
             <tbody>
                 {% for request in service_requests %}
                 <tr>
-                    <td>{{ request.id }}</td>
+                    <td>{{ request.req_id }}</td>
                     <td>{{ request.assigned_professional_name }}</td>
-                    <td>{{ request.requested_date }}</td>
+                    <td>{{ request.requested_date.strftime('%Y-%m-%d') }}</td>
                     <td>{{ request.status }}</td>
                 </tr>
                 {% endfor %}
