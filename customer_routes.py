@@ -9,12 +9,14 @@ customer_bp = Blueprint('customer', __name__)
 # Route for viewing the customer dashboard
 @customer_bp.route('/dashboard')
 def dashboard():
-    # Assuming 'current_user' is the logged-in customer
-    user_id = current_user.user_id
-    
-    # Fetching service history for the current user (customer)
+    user_id = session.get('user_id')
+    if not user_id:
+        flash('You must log in to access the dashboard.', 'danger')
+        return redirect(url_for('main.login'))  # Replace with your login route
+
+    # Fetch service history for the current user
     service_history = ServiceRequest.query.filter_by(user_id=user_id).all()
-    
+
     # Query all available services
     services = Service.query.all()
 
@@ -23,6 +25,7 @@ def dashboard():
         services=services,
         service_history=service_history
     )
+
 
 
 
@@ -63,70 +66,84 @@ def dashboard():
 
 
 # Route for closing a service request
-@customer_bp.route('/close_service/<int:request_id>', methods=['POST'])
-def close_service(request_id):
-    customer_id = request.args.get('customer_id')  # Get customer_id from the request
+@customer_bp.route('/service_feedback/<int:request_id>', methods=['GET', 'POST'])
+def service_feedback(request_id):
+    # Check if the user is logged in
+    user_id = session.get('user_id')
+    if not user_id:
+        flash('You must be logged in to provide feedback.', 'danger')
+        return redirect(url_for('main.login'))  # Replace 'main.login' with your login route
 
-    if not customer_id:
-        flash('Customer ID is required to close a service request.', 'danger')
-        return redirect(url_for('main.index'))  # Redirect to home page or login page if no customer_id
-
+    # Fetch the service request
     service_request = ServiceRequest.query.get_or_404(request_id)
 
-    # Ensure that only the customer who made the request can close it
-    if service_request.customer_id != customer_id:
-        flash('You cannot close this service request.', 'danger')
-        return redirect(url_for('customer.dashboard', customer_id=customer_id))
+    # Ensure that the logged-in user owns the service request
+    if service_request.user_id != user_id:
+        flash('You cannot provide feedback for this service request.', 'danger')
+        return redirect(url_for('customer.dashboard'))
 
-    # Check if the service request is still "Requested"
-    if service_request.status != 'Requested':
-        flash('This service request is already closed or completed.', 'warning')
-        return redirect(url_for('customer.dashboard', customer_id=customer_id))
-
-    # Update the status to "Closed"
-    service_request.status = 'Closed'
-    service_request.close_date = datetime.now()  # Optional: record the time of closure
-    db.session.commit()
-
-    flash(f'Your service request has been closed.', 'success')
-    return redirect(url_for('customer.dashboard', customer_id=customer_id))
-
-
-# Route for reviewing a service request
-@customer_bp.route('/review_service/<int:request_id>', methods=['GET', 'POST'])
-def review_service(request_id):
-    customer_id = request.args.get('customer_id')  # Get customer_id from the request
-
-    if not customer_id:
-        flash('Customer ID is required to review a service.', 'danger')
-        return redirect(url_for('main.index'))  # Redirect to home page or login page if no customer_id
-
-    service_request = ServiceRequest.query.get_or_404(request_id)
-
-    # Ensure that only the customer who made the request can review it
-    if service_request.customer_id != customer_id:
-        flash('You cannot review this service request.', 'danger')
-        return redirect(url_for('customer.dashboard', customer_id=customer_id))
-
-    # Check if the service request has been completed or closed
-    if service_request.status != 'Closed':
-        flash('You can only review closed services.', 'warning')
-        return redirect(url_for('customer.dashboard', customer_id=customer_id))
-
-    # Handle the review form submission
     if request.method == 'POST':
+        # Get form data
         rating = request.form.get('rating')
-        review = request.form.get('review')
+        remarks = request.form.get('remarks')
 
-        # Add the review and rating to the service request
-        service_request.rating = rating
-        service_request.review = review
+        # Validate rating
+        if not rating or not rating.isdigit() or not (1 <= int(rating) <= 5):
+            flash('Invalid rating. Please select a valid rating between 1 and 5.', 'danger')
+            return redirect(url_for('customer.service_feedback', request_id=request_id))
+
+        # Update the service request with feedback
+        service_request.rating = int(rating)
+        service_request.remarks = remarks
+        service_request.status = 'Closed'  # Update status to "Closed"
+        service_request.close_date = datetime.now()  # Record closure date
         db.session.commit()
 
-        flash('Your review has been submitted successfully!', 'success')
-        return redirect(url_for('customer.dashboard', customer_id=customer_id))
+        flash('Your feedback has been submitted successfully!', 'success')
+        return redirect(url_for('customer.dashboard'))
 
-    return render_template('user_panel/review_service.html', service_request=service_request)
+    # Render the feedback form
+    return render_template(
+        'user_panel/service_feedback.html',
+        service_request=service_request
+    )
+
+
+# # Route for reviewing a service request
+# @customer_bp.route('/review_service/<int:request_id>', methods=['GET', 'POST'])
+# def review_service(request_id):
+#     customer_id = request.args.get('customer_id')  # Get customer_id from the request
+
+#     if not customer_id:
+#         flash('Customer ID is required to review a service.', 'danger')
+#         return redirect(url_for('main.index'))  # Redirect to home page or login page if no customer_id
+
+#     service_request = ServiceRequest.query.get_or_404(request_id)
+
+#     # Ensure that only the customer who made the request can review it
+#     if service_request.customer_id != customer_id:
+#         flash('You cannot review this service request.', 'danger')
+#         return redirect(url_for('customer.dashboard', customer_id=customer_id))
+
+#     # Check if the service request has been completed or closed
+#     if service_request.status != 'Closed':
+#         flash('You can only review closed services.', 'warning')
+#         return redirect(url_for('customer.dashboard', customer_id=customer_id))
+
+#     # Handle the review form submission
+#     if request.method == 'POST':
+#         rating = request.form.get('rating')
+#         review = request.form.get('review')
+
+#         # Add the review and rating to the service request
+#         service_request.rating = rating
+#         service_request.review = review
+#         db.session.commit()
+
+#         flash('Your review has been submitted successfully!', 'success')
+#         return redirect(url_for('customer.dashboard', customer_id=customer_id))
+
+#     return render_template('user_panel/review_service.html', service_request=service_request)
 
 
 
@@ -143,7 +160,7 @@ def subcategory(service_id):
     user_id = session.get('user_id')  # Get logged-in user's ID
     if not user_id:
         flash("You need to log in to access this page.", "danger")
-        return redirect(url_for('auth.login'))  # Redirect to login page
+        return redirect(url_for('main.login'))  # Redirect to login page
 
     if request.args.get('action') == 'book_service':
         prof_id = None  # Initialize prof_id to None

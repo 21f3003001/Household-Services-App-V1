@@ -37,7 +37,6 @@
             <p class="text-muted mt-3">No services available at the moment.</p>
         {% endif %}
     </section>
-    
 
     <!-- Service History Section -->
     <section class="service-history mt-5">
@@ -65,11 +64,10 @@
                             {% if service_request.status == 'Closed' %}
                                 Closed
                             {% elif service_request.status == 'Requested' %}
-                                <form action="{{ url_for('customer.close_service', request_id=service_request.req_id) }}" method="POST">
-                                    <button type="submit" class="btn btn-warning">Close?</button>
-                                </form>
+                                Requested
+                            {% elif service_request.status == 'Accepted' %}    
+                                <a href="{{ url_for('customer.service_feedback', request_id=service_request.req_id) }}" class="btn btn-warning">Close?</a>
                             {% endif %}
-                            <a href="{{ url_for('customer.review_service', request_id=service_request.req_id) }}" class="btn btn-secondary">Review</a>
                         </td>
                     </tr>
                 {% endfor %}
@@ -80,4 +78,5 @@
         {% endif %}
     </section>
 </div>
+
 {% endblock %}

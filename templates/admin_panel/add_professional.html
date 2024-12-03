@@ -29,6 +29,11 @@
                 <option value="Pest Control">Pest Control</option>
                 <option value="Home Security Services">Home Security Services</option>
                 <option value="Gardening/Landscaping">Gardening/Landscaping</option>
+                {% for existing_service in services %}
+                    <option value="{{ existing_service.name }}">
+                        {{ existing_service.name }}
+                    </option>
+                {% endfor %}
             </select>
         </div>
         <div class="mb-3">

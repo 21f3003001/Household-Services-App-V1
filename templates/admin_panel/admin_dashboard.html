@@ -79,6 +79,8 @@
                     <th>Name</th>
                     <th>Experience (Years)</th>
                     <th>Service Name</th>
+                    <th>Location</th>
+                    <th>Pincode</th>
                     <th>Status</th>
                     <th>Actions</th>
                 </tr>
@@ -91,6 +93,8 @@
                     <td>{{ professional.prof_name }}</td>
                     <td>{{ professional.experience or 'N/A' }}</td>
                     <td>{{ professional.service_type }}</td>
+                    <td>{{ professional.address }}</td>
+                    <td>{{ professional.pincode }}</td>
                     <td>
                         {% if professional.status == 'PENDING' %}
                             <span class="badge bg-warning">Pending</span>
@@ -174,15 +178,17 @@
                     <th>Assigned Professional</th>
                     <th>Requested Date</th>
                     <th>Status (Requested/Accepted/Completed)</th>
+                    <th>Rating</th>
                 </tr>
             </thead>
             <tbody>
                 {% for request in service_requests %}
                 <tr>
                     <td>{{ request.req_id }}</td>
-                    <td>{{ request.assigned_professional_name }}</td>
+                    <td>{{ request.service_professionals.prof_name }}</td>
                     <td>{{ request.requested_date.strftime('%Y-%m-%d') }}</td>
                     <td>{{ request.status }}</td>
+                    <td>{{ request.rating }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

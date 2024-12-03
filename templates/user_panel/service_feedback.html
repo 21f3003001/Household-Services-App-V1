@@ -1,0 +1,62 @@
+{% extends 'user_panel/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h3>Provide Feedback for Service</h3>
+    <form action="{{ url_for('customer.service_feedback', request_id=service_request.req_id) }}" method="POST">
+        <div class="mb-3">
+            <label for="serviceName" class="form-label">Service Name</label>
+            <input type="text" class="form-control" id="serviceName" value="{{ service_request.service.name }}" readonly>
+        </div>
+
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" rows="3" readonly>{{ service_request.service.description }}</textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="prof_id" class="form-label">Professional ID</label>
+            <input type="integer" class="form-control" id="prof_id" 
+                   value="{{ service_request.service_professionals.prof_id if service_request.service_professionals else 'N/A' }}" readonly>
+        </div>
+
+        <div class="mb-3">
+            <label for="professionalName" class="form-label">Professional Name</label>
+            <input type="text" class="form-control" id="professionalName" 
+                   value="{{ service_request.service_professionals.prof_name if service_request.service_professionals else 'N/A' }}" readonly>
+        </div>
+
+        <div class="mb-3">
+            <label for="contact" class="form-label">Contact</label>
+            <input type="text" class="form-control" id="contact" 
+                   value="{{ service_request.service_professionals.contact if service_request.service_professionals else 'N/A' }}" readonly>
+        </div>
+
+        <div class="mb-3">
+            <label for="date" class="form-label">Close Date</label>
+            <input type="text" class="form-control" id="date" 
+                   value="{{ service_request.close_date.strftime('%Y-%m-%d') }}" readonly>
+        </div>
+
+        <div class="mb-3">
+            <label for="rating" class="form-label">Service Rating</label>
+            <select class="form-select" id="rating" name="rating" required>
+                <option value="" disabled selected>Select Rating</option>
+                <option value="1">1 Star</option>
+                <option value="2">2 Stars</option>
+                <option value="3">3 Stars</option>
+                <option value="4">4 Stars</option>
+                <option value="5">5 Stars</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="remarks" class="form-label">Remarks (if any)</label>
+            <textarea class="form-control" id="remarks" name="remarks" rows="3"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <a href="{{ url_for('customer.dashboard') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

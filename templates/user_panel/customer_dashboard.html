@@ -53,11 +53,10 @@
                             {% if service_request.status == 'Closed' %}
                                 Closed
                             {% elif service_request.status == 'Requested' %}
-                                <form action="{{ url_for('customer.close_service', request_id=service_request.req_id) }}" method="POST">
+                                <form action="{{ url_for('customer.service_feedback', request_id=service_request.req_id) }}" method="GET">
                                     <button type="submit" class="btn btn-warning">Close?</button>
                                 </form>
                             {% endif %}
-                            <a href="{{ url_for('customer.review_service', request_id=service_request.req_id) }}" class="btn btn-secondary">Review</a>
                         </td>
                     </tr>
                 {% else %}

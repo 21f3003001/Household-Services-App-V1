@@ -1,6 +1,6 @@
 # routes.py
 from flask import Blueprint, render_template, request, flash, redirect, url_for, session
-from models import db, User, ServiceProfessional, Customer, Service
+from models import db, User, ServiceProfessional, Customer, Service, ServiceRequest
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 
@@ -181,13 +181,91 @@ def login():
 
 @main.route('/customer_dashboard')
 def customer_dashboard():
-    services = Service.query.all()
-    return render_template('user_panel/customer_dashboard.html', services=services)
+    return redirect(url_for('customer.dashboard'))
 
 @main.route('/professional_dashboard')
 def professional_dashboard():
     services = Service.query.all()
-    return render_template('service_panel/professional_dashboard.html', services=services)
+    # Fetch logged-in professional's ID from session
+    prof_id = session.get('prof_id')
+    if not prof_id:
+        flash("You must be logged in to view your dashboard.", "danger")
+        return redirect(url_for('main.login'))  # Redirect to login page if not logged in
+
+    # Fetch today's requested services (status: 'Requested')
+    today_services = (
+        db.session.query(
+            ServiceRequest.req_id,
+            User.user_name,
+            User.contact,
+            User.address,
+            User.pincode,
+            ServiceRequest.status
+        )
+        .join(User, ServiceRequest.user_id == User.user_id)
+        .filter(ServiceRequest.prof_id == prof_id, ServiceRequest.status == 'Requested')
+        .all()
+    )
+
+        # Fetch today's requested services (status: 'Accepted')
+    accept = (
+        db.session.query(
+            ServiceRequest.req_id,
+            User.user_name,
+            User.contact,
+            User.address,
+            User.pincode,
+            ServiceRequest.status
+        )
+        .join(User, ServiceRequest.user_id == User.user_id)
+        .filter(ServiceRequest.prof_id == prof_id, ServiceRequest.status == 'Accepted')
+        .all()
+    )
+
+        # Fetch today's requested services (status: 'Rejected')
+    reject = (
+        db.session.query(
+            ServiceRequest.req_id,
+            User.user_name,
+            User.contact,
+            User.address,
+            User.pincode,
+            ServiceRequest.status
+        )
+        .join(User, ServiceRequest.user_id == User.user_id)
+        .filter(ServiceRequest.prof_id == prof_id, ServiceRequest.status == 'Rejected')
+        .all()
+    )
+
+    # Fetch closed services (status: 'Closed')
+    closed_services = (
+        db.session.query(
+            ServiceRequest.req_id,
+            User.user_name,
+            User.contact,
+            User.address,
+            User.pincode,
+            ServiceRequest.close_date,
+            ServiceRequest.rating,
+            ServiceRequest.remarks
+        )
+        .join(User, ServiceRequest.user_id == User.user_id)
+        .filter(ServiceRequest.prof_id == prof_id, ServiceRequest.status == 'Closed')
+        .all()
+    )
+
+
+    # Render the template with retrieved data
+    return render_template(
+        'service_panel/professional_dashboard.html',
+        today_services=today_services,
+        closed_services=closed_services,
+        services=services,
+        accept=accept,
+        reject=reject
+    )
+
+
 
 
 @main.route('/admin_dashboard')
