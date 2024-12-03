@@ -51,6 +51,7 @@
                 <thead class="table-secondary">
                     <tr>
                         <th>ID</th>
+                        <th>Service</th>
                         <th>Customer Name</th>
                         <th>Contact No</th>
                         <th>Location</th>
@@ -62,6 +63,7 @@
                     {% for service in accept %}
                     <tr>
                         <td>{{ service.req_id }}</td>
+                        <td>{{ service.name }}</td>
                         <td>{{ service.user_name }}</td>
                         <td>{{ service.contact }}</td>
                         <td>{{ service.address }}</td>
@@ -84,6 +86,7 @@
                 <thead class="table-secondary">
                     <tr>
                         <th>ID</th>
+                        <th>Service</th>
                         <th>Customer Name</th>
                         <th>Contact No</th>
                         <th>Location</th>
@@ -95,6 +98,7 @@
                     {% for service in reject %}
                     <tr>
                         <td>{{ service.req_id }}</td>
+                        <td>{{ service.name }}</td>
                         <td>{{ service.user_name }}</td>
                         <td>{{ service.contact }}</td>
                         <td>{{ service.address }}</td>
@@ -115,11 +119,13 @@
                 <thead class="table-secondary">
                     <tr>
                         <th>ID</th>
+                        <th>Service</th>
                         <th>Customer Name</th>
                         <th>Contact Phone</th>
                         <th>Location</th>
                         <th>Pincode</th>
                         <th>Close Date</th>
+                        <th>Status</th>
                         <th>Rating</th>
                     </tr>
                 </thead>
@@ -127,11 +133,13 @@
                     {% for service in closed_services %}
                     <tr>
                         <td>{{ service.req_id }}</td>
+                        <td>{{ service.name }}</td>
                         <td>{{ service.user_name }}</td>
                         <td>{{ service.contact }}</td>
                         <td>{{ service.address }}</td>
                         <td>{{ service.pincode }}</td>
                         <td>{{ service.close_date.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ service.status }}</td>
                         <td>{{ service.rating or 'N/A' }}</td>
                     </tr>
                     {% endfor %}

@@ -211,6 +211,7 @@ def professional_dashboard():
     accept = (
         db.session.query(
             ServiceRequest.req_id,
+            Service.name,
             User.user_name,
             User.contact,
             User.address,
@@ -227,6 +228,7 @@ def professional_dashboard():
         db.session.query(
             ServiceRequest.req_id,
             User.user_name,
+            Service.name,
             User.contact,
             User.address,
             User.pincode,
@@ -242,10 +244,12 @@ def professional_dashboard():
         db.session.query(
             ServiceRequest.req_id,
             User.user_name,
+            Service.name,
             User.contact,
             User.address,
             User.pincode,
             ServiceRequest.close_date,
+            ServiceRequest.status,
             ServiceRequest.rating,
             ServiceRequest.remarks
         )

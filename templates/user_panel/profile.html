@@ -1,0 +1,37 @@
+{% extends "user_panel/base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>Update Profile</h1>
+    <form method="POST">
+        <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" name="password" placeholder="Enter new password (optional)">
+            <small class="text-muted">Leave blank to keep your current password.</small>
+        </div>
+        <div class="mb-3">
+            <label for="user_name" class="form-label">Full Name</label>
+            <input type="text" class="form-control" id="user_name" name="user_name" value="{{ user.user_name }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="address" class="form-label">Address</label>
+            <textarea class="form-control" id="address" name="address" rows="3" required>{{ user.address }}</textarea>
+        </div>
+        <div class="mb-3">
+            <label for="contact" class="form-label">Contact Number</label>
+            <input type="tel" class="form-control" id="contact" name="contact" value="{{ user.contact }}" pattern="[0-9]{10}" required>
+        </div>
+        <div class="mb-3">
+            <label for="pincode" class="form-label">Pincode</label>
+            <input type="text" class="form-control" id="pincode" name="pincode" value="{{ user.pincode }}" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Update Profile</button>
+        <a href="{{ url_for('main.customer_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+    </form>
+</div>
+{% endblock %}

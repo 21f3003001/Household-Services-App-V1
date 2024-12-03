@@ -145,15 +145,6 @@
                     <td>{{ customer.address }}</td>
                     <td>{{ customer.pincode }}</td>
                     <td>{{ customer.status }}</td>
-                    <!-- <td>
-                        {% if customer.status == 'PENDING' %}
-                            <span class="badge bg-warning">Pending</span>
-                        {% elif customer.status == 'APPROVED' %}
-                            <span class="badge bg-success">Approved</span>
-                        {% elif customer.status == 'REJECTED' %}
-                            <span class="badge bg-danger">Rejected</span>
-                        {% endif %}
-                    </td> -->
                     <td>
                         {% if customer.status == 'Active' %}
                             <a href="{{ url_for('admin.block_customer', customer_id=customer.user_id) }}" class="btn btn-success btn-sm">Block</a>

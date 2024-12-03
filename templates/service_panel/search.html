@@ -1,0 +1,101 @@
+{% extends "service_panel/base.html" %}
+
+{% block content %}
+
+<!-- Search Functionality -->
+<div class="mt-4">
+    <h3>Search</h3>
+    <form method="GET" action="{{ url_for('professional.search') }}">
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label for="search_by" class="form-label">Search By:</label>
+                <select class="form-select" id="search_by" name="search_by" required>
+                    <option value="customers">Customers</option>
+                    <option value="requests">Service Status</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="query" class="form-label">Search Text:</label>
+                <input type="text" class="form-control" id="query" name="query" placeholder="Enter search text" required>
+            </div>
+            <div class="col-md-2 align-self-end">
+                <button type="submit" class="btn btn-primary w-100">Search</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Display Results -->
+<div>
+    {% if results %}
+        {% if search_by == "customers" %}
+            <h3>Customers</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Service</th>
+                        <th>Customer Name</th>
+                        <th>Contact</th>
+                        <th>Location</th>
+                        <th>Pincode</th>
+                        <th>Close Date</th>
+                        <th>Status</th>
+                        <th>Rating</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for customer in results %}
+                    <tr>
+                        <td>{{ customer.req_id }}</td>
+                        <td>{{ customer.name }}</td>
+                        <td>{{ customer.user_name }}</td>
+                        <td>{{ customer.contact }}</td>
+                        <td>{{ customer.address }}</td>
+                        <td>{{ customer.pincode }}</td>
+                        <td>{{ customer.close_date }}</td>
+                        <td>{{ customer.status }}</td>
+                        <td>{{ customer.rating }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% elif search_by == "requests" %}
+            <h3>Service Requests</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Service</th>
+                        <th>Customer Name</th>
+                        <th>Contact</th>
+                        <th>Location</th>
+                        <th>Pincode</th>
+                        <th>Close Date</th>
+                        <th>Status</th>
+                        <th>Rating</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for request in results %}
+                    <tr>
+                        <td>{{ request.req_id }}</td>
+                        <td>{{ request.name }}</td>
+                        <td>{{ request.user_name }}</td>
+                        <td>{{ request.contact }}</td>
+                        <td>{{ request.address }}</td>
+                        <td>{{ request.pincode }}</td>
+                        <td>{{ request.close_date }}</td>
+                        <td>{{ request.status }}</td>
+                        <td>{{ request.rating }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    {% else %}
+        <p>No results found for your search.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

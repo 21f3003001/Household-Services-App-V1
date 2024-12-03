@@ -363,10 +363,81 @@ def delete_professional(professional_id):
 # Search functionality route
 @admin_bp.route('/admin_dashboard/search', methods=['GET'])
 def search():
-    query = request.args.get('query', '')
-    # Add search logic here (e.g., filter services, professionals, or service requests based on the query)
-    # For now, just render the search page (implement search logic as needed)
-    return render_template('admin_panel/search.html', query=query)
+    search_by = request.args.get('search_by')
+    query = request.args.get('query', '').strip().lower()
+    services = Service.query.all()
+
+    if search_by == "services":
+        # Filter by service name
+        results = Service.query.filter(Service.name.contains(query)).all()
+
+    elif search_by == "customers":
+        # Filter by user name, location, pincode, or status
+        results = (
+            User.query.filter(
+                db.or_(
+                    User.user_name.contains(query),
+                    User.address.contains(query),
+                    User.pincode.contains(query),
+                    User.status.contains(query),
+                )
+            ).all()
+        )
+
+    elif search_by == "professionals":
+    # Filter by professional name, location, pincode, status, or service name
+        results = (
+            db.session.query(
+                ServiceProfessional,
+                Service.name.label("service_name")  # Select service name explicitly
+            )
+            .join(ServiceProfessional, Service.service_id == Service.service_id)  # Join with Service table
+            .filter(
+                db.or_(
+                    ServiceProfessional.prof_name.contains(query),
+                    ServiceProfessional.address.contains(query),
+                    ServiceProfessional.pincode.contains(query),
+                    ServiceProfessional.status.contains(query),
+                    Service.name.contains(query),  # Filter by service name
+                )
+            )
+            .all()
+        )
+
+
+    elif search_by == "requests":
+        # Filter by professional name, status, or rating
+        results = (
+            db.session.query(
+                ServiceRequest.req_id,
+                ServiceProfessional.prof_name,
+                ServiceRequest.requested_date,
+                ServiceRequest.status,
+                ServiceRequest.rating,
+            )
+            .join(ServiceProfessional, ServiceRequest.prof_id == ServiceProfessional.prof_id)
+            .filter(
+                db.or_(
+                    ServiceProfessional.prof_name.contains(query),
+                    ServiceRequest.status.contains(query),
+                    ServiceRequest.rating.contains(query),
+                )
+            )
+            .all()
+        )
+
+    else:
+        results = []
+
+    # Pass results and query back to the template
+    return render_template(
+        'admin_panel/search.html', 
+        results=results, 
+        search_by=search_by, 
+        query=query, 
+        services=services
+    )
+
 
 @admin_bp.route('/admin_dashboard/summary', methods=['GET'])
 def summary():

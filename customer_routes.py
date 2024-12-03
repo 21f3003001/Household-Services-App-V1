@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, session
-from models import db, Service, ServiceRequest, ServiceProfessional # Import necessary models
+from models import db, Service, ServiceRequest, ServiceProfessional, User # Import necessary models
 from datetime import datetime
 from flask_login import login_required, current_user
 
@@ -25,44 +25,6 @@ def dashboard():
         services=services,
         service_history=service_history
     )
-
-
-
-
-
-# # Route for booking a service
-# @customer_bp.route('/book_service/<int:service_id>', methods=['GET', 'POST'])
-# def book_service(service_id):
-#     user_id = session.get('user_id')  # Get user_id from the session
-
-#     if not user_id:
-#         flash('User not logged in. Please log in to book a service.', 'danger')
-#         return redirect(url_for('main.customer_dashboard'))  # Redirect to home page if no user_id
-
-#     service = Service.query.get_or_404(service_id)
-
-#     # Check if the user has already booked this service
-#     existing_request = ServiceRequest.query.filter_by(user_id=user_id, service_id=service_id, status='Requested').first()
-#     if existing_request:
-#         flash('You have already requested this service.', 'warning')
-#         return redirect(url_for('customer.dashboard'))
-
-#     # Handle the booking form
-#     if request.method == 'POST':
-#         new_request = ServiceRequest(
-#             user_id=user_id,
-#             service_id=service_id,
-#             prof_id=None,  # Set based on your business logic
-#             status='Requested',
-#             requested_date=datetime.now()
-#         )
-#         db.session.add(new_request)
-#         db.session.commit()
-
-#         flash(f'Your {service.name} service has been successfully requested!', 'success')
-#         return redirect(url_for('customer.dashboard'))
-
-#     return render_template('user_panel/subcategory.html', service=service)
 
 
 # Route for closing a service request
@@ -107,43 +69,6 @@ def service_feedback(request_id):
         'user_panel/service_feedback.html',
         service_request=service_request
     )
-
-
-# # Route for reviewing a service request
-# @customer_bp.route('/review_service/<int:request_id>', methods=['GET', 'POST'])
-# def review_service(request_id):
-#     customer_id = request.args.get('customer_id')  # Get customer_id from the request
-
-#     if not customer_id:
-#         flash('Customer ID is required to review a service.', 'danger')
-#         return redirect(url_for('main.index'))  # Redirect to home page or login page if no customer_id
-
-#     service_request = ServiceRequest.query.get_or_404(request_id)
-
-#     # Ensure that only the customer who made the request can review it
-#     if service_request.customer_id != customer_id:
-#         flash('You cannot review this service request.', 'danger')
-#         return redirect(url_for('customer.dashboard', customer_id=customer_id))
-
-#     # Check if the service request has been completed or closed
-#     if service_request.status != 'Closed':
-#         flash('You can only review closed services.', 'warning')
-#         return redirect(url_for('customer.dashboard', customer_id=customer_id))
-
-#     # Handle the review form submission
-#     if request.method == 'POST':
-#         rating = request.form.get('rating')
-#         review = request.form.get('review')
-
-#         # Add the review and rating to the service request
-#         service_request.rating = rating
-#         service_request.review = review
-#         db.session.commit()
-
-#         flash('Your review has been submitted successfully!', 'success')
-#         return redirect(url_for('customer.dashboard', customer_id=customer_id))
-
-#     return render_template('user_panel/review_service.html', service_request=service_request)
 
 
 
@@ -208,55 +133,96 @@ def subcategory(service_id):
 
 
 
+#Search
 
-@customer_bp.route('/search')
+@customer_bp.route('/search', methods=['GET'])
 def search():
-    return render_template('user_panel/search_service.html')
+    search_by = request.args.get('search_by')
+    query = request.args.get('query', '').strip().lower()
+    services = Service.query.all()
+
+    # Get the logged-in user's ID
+    user_id = session.get('user_id')  # Assuming `user_id` is stored in the session
+
+    if not user_id:
+        flash("Please log in to view your data.", "danger")
+        return redirect(url_for('customer.login'))
+
+    if search_by == "services":
+        # Search for services the customer has requested
+        results = (
+            db.session.query(ServiceRequest)
+            .join(Service, ServiceRequest.service_id == Service.id)
+            .filter(
+                ServiceRequest.user_id == user_id,  # Restrict to logged-in user
+                Service.name.contains(query)
+            )
+            .all()
+        )
+    elif search_by == "professionals":
+        # Search for professionals associated with services the customer has requested
+        results = (
+            db.session.query(ServiceProfessional)
+            .join(ServiceRequest, ServiceRequest.prof_id == ServiceProfessional.prof_id)
+            .filter(
+                ServiceRequest.user_id == user_id,  # Restrict to logged-in user
+                ServiceProfessional.prof_name.contains(query)
+            )
+            .all()
+        )
+    elif search_by == "requests":
+        # Search for service requests by their status
+        results = (
+            ServiceRequest.query
+            .filter(
+                ServiceRequest.user_id == user_id,  # Restrict to logged-in user
+                ServiceRequest.status.contains(query)
+            )
+            .all()
+        )
+    else:
+        results = []
+
+    # Pass results and query back to the template
+    return render_template(
+        'user_panel/search.html',
+        results=results,
+        search_by=search_by,
+        query=query,
+        services=services
+    )
+
 
 @customer_bp.route('/summary')
 def summary():
     return render_template('user_panel/summary.html')
 
-@customer_bp.route('/profile')
+@customer_bp.route('/profile', methods=['GET', 'POST'])
 def profile():
-    # Logic for rendering the profile page
-    return render_template('user_panel/profile.html')
+    user_id = session.get('user_id')  # Fetch logged-in user's ID from the session
+    if not user_id:
+        flash("You must be logged in to update your profile.", "danger")
+        return redirect(url_for('main.login'))  # Redirect to login if not logged in
 
-# @customer_bp.route('/book_service/<int:service_id>', methods=['POST'])
-# def book_service(service_id):
-#     # Book the selected service
-#     new_request = ServiceRequest(service_id=service_id, status='Requested', request_date=datetime.now())
-#     db.session.add(new_request)
-#     db.session.commit()
-#     flash("Service booked successfully.")
-#     return redirect(url_for('customer.dashboard'))
+    user = User.query.get_or_404(user_id)  # Fetch the user's details
 
-# @customer_bp.route('/close_service/<int:request_id>', methods=['POST'])
-# def close_service(request_id):
-#     # Update the service status to closed
-#     service_request = ServiceRequest.query.get(request_id)
-#     service_request.status = 'Closed'
-#     db.session.commit()
-#     flash("Service closed successfully.")
-#     return redirect(url_for('customer.dashboard'))
+    if request.method == 'POST':
+        # Update the user's profile details
+        user.username = request.form['username']
+        user.user_name = request.form['user_name']
+        user.address = request.form['address']
+        user.contact = request.form['contact']
+        user.pincode = request.form['pincode']
 
-# @customer_bp.route('/review_service/<int:request_id>', methods=['GET', 'POST'])
-# def review_service(request_id):
-#     if request.method == 'POST':
-#         # Save the review
-#         rating = request.form.get('rating')
-#         remarks = request.form.get('remarks')
-#         service_request = ServiceRequest.query.get(request_id)
-#         service_request.rating = rating
-#         service_request.remarks = remarks
-#         db.session.commit()
-#         flash("Thank you for your feedback!")
-#         return redirect(url_for('customer.dashboard'))
-#     return render_template('user_panel/review.html', request_id=request_id)
+        # Update the password only if provided
+        if request.form['password']:
+            user.password = request.form['password']  # Add proper password hashing!
 
+        db.session.commit()
+        flash("Profile updated successfully!", "success")
+        return redirect(url_for('main.customer_dashboard'))
 
-
-
+    return render_template('user_panel/profile.html', user=user)
 
 
 

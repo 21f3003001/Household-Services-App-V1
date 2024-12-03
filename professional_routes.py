@@ -1,60 +1,40 @@
 from flask import Blueprint, render_template, session, redirect, url_for, flash, request, jsonify
 from models import db, Service, ServiceProfessional, ServiceRequest, User
 from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
 
 professional_bp = Blueprint('professional', __name__)
 
-# @professional_bp.route('/professional_dashboard', methods=['GET'])
-# def professional_dashboard():
-#     # Fetch logged-in professional's ID from session
-#     prof_id = session.get('prof_id')
-#     if not prof_id:
-#         flash("You must be logged in to view your dashboard.", "danger")
-#         return redirect(url_for('main.login'))  # Redirect to login page if not logged in
+@professional_bp.route('/professional_dashboard/profile', methods=['GET', 'POST'])
+def profile():
+    # Fetch logged-in professional's ID from session
+    prof_id = session.get('prof_id')
+    if not prof_id:
+        flash("You must be logged in to access your profile.", "danger")
+        return redirect(url_for('main.login'))
 
-#     # Fetch today's requested services (status: 'Requested')
-#     today_services = (
-#         db.session.query(
-#             ServiceRequest.req_id,
-#             User.user_name,
-#             User.contact,
-#             User.address,
-#             User.pincode,
-#             ServiceRequest.status
-#         )
-#         .join(User, ServiceRequest.user_id == User.user_id)
-#         .filter(ServiceRequest.prof_id == prof_id, ServiceRequest.status == 'Requested')
-#         .all()
-#     )
+    # Fetch the professional's details from the database
+    professional = ServiceProfessional.query.get_or_404(prof_id)
 
-#     # Fetch closed services (status: 'Closed')
-#     closed_services = (
-#         db.session.query(
-#             ServiceRequest.req_id,
-#             User.user_name,
-#             User.contact,
-#             User.address,
-#             User.pincode,
-#             ServiceRequest.close_date,
-#             ServiceRequest.rating,
-#             ServiceRequest.remarks
-#         )
-#         .join(User, ServiceRequest.user_id == User.user_id)
-#         .filter(ServiceRequest.prof_id == prof_id, ServiceRequest.status == 'Closed')
-#         .all()
-#     )
+    if request.method == 'POST':
+        # Update profile fields
+        professional.username = request.form['username']
+        professional.prof_name = request.form['prof_name']
+        professional.service_type = request.form['service_type']
+        professional.experience = request.form['experience']
+        professional.address = request.form['address']
+        professional.contact = request.form['contact']
+        professional.pincode = request.form['pincode']
 
-#     # Debugging output to verify query results
-#     print("Today's Services:", today_services)
-#     print("Closed Services:", closed_services)
+        # Update the password if provided
+        if request.form['password']:
+            professional.password = generate_password_hash(request.form['password'])  # Use password hashing
 
-#     # Render the template with retrieved data
-#     return render_template(
-#         'service_panel/professional_dashboard.html',
-#         today_services=today_services,
-#         closed_services=closed_services
-#     )
+        db.session.commit()
+        flash("Profile updated successfully!", "success")
+        return redirect(url_for('main.professional_dashboard'))
 
+    return render_template('service_panel/profile.html', professional=professional)
 
 
 
@@ -101,52 +81,86 @@ def reject_service(service_id):
 # Search functionality route
 @professional_bp.route('/professional_dashboard/search', methods=['GET'])
 def search():
-    query = request.args.get('query', '')
-    # Add search logic here (e.g., filter services, professionals, or service requests based on the query)
-    # For now, just render the search page (implement search logic as needed)
-    return render_template('service_panel/search.html', query=query)
+    search_by = request.args.get('search_by')
+    query = request.args.get('query', '').strip().lower()
+    services = Service.query.all()
+
+    # Get the logged-in professional's ID
+    prof_id = session.get('prof_id')  # Assuming `prof_id` is stored in the session
+
+    if not prof_id:
+        flash("Please log in to view your data.", "danger")
+        return redirect(url_for('customer.login'))
+
+    if search_by == "customers":
+        # Search for customers associated with the logged-in professional's service requests
+        results = (
+            db.session.query(
+                ServiceRequest.req_id,
+                Service.name,
+                User.user_name,
+                User.contact,
+                User.address,
+                User.pincode,
+                ServiceRequest.close_date,
+                ServiceRequest.status,
+            )
+            .join(ServiceRequest, ServiceRequest.user_id == User.user_id)
+            .filter(
+                ServiceRequest.prof_id == prof_id,  # Restrict to logged-in professional
+                db.or_(
+                    Service.name.contains(query),  # Search by service name
+                    User.user_name.contains(query),  # Search by customer name
+                    User.address.contains(query),  # Search by location
+                    User.pincode.contains(query),  # Search by pincode
+                    ServiceRequest.status.contains(query)  # Search by status
+                )
+            )
+            .all()
+        )
+    elif search_by == "requests":
+        # Search for service requests by multiple filters and fetch additional details
+        results = (
+            db.session.query(
+                ServiceRequest.req_id,
+                Service.name,
+                User.user_name,
+                User.contact,
+                User.address,
+                User.pincode,
+                ServiceRequest.close_date,
+                ServiceRequest.status,
+                ServiceRequest.rating,
+            )
+            .join(User, ServiceRequest.user_id == User.user_id)  # Join with User table
+            .join(Service, ServiceRequest.service_id == Service.service_id)  # Join with Service table
+            .filter(
+                ServiceRequest.prof_id == prof_id,  # Restrict to logged-in professional
+                db.or_(
+                    Service.name.contains(query),  # Search by service name
+                    User.user_name.contains(query),  # Search by customer name
+                    User.address.contains(query),  # Search by location
+                    User.pincode.contains(query),  # Search by pincode
+                    ServiceRequest.status.contains(query)  # Search by status
+                )
+            )
+            .all()
+        )
+    else:
+        results = []
+
+    # Pass results and query back to the template
+    return render_template(
+        'service_panel/search.html',
+        results=results,
+        search_by=search_by,
+        query=query,
+        services=services
+    )
 
 @professional_bp.route('/professional_dashboard/summary', methods=['GET'])
 def summary():
     return render_template('service_panel/summary.html')
 
-@professional_bp.route('/professional_dashboard/profile')
-def profile():
-    # Logic for rendering the profile page
-    return render_template('service_panel/profile.html')
-
-from flask import jsonify, request  # Ensure both are imported
-
-@professional_bp.route('/test_query', methods=['GET'])
-def test_query():
-    # Fetch logged-in professional's ID from session
-    prof_id = session.get('prof_id')
-    if not prof_id:
-        return jsonify({"error": "Professional ID not found in session"}), 401
-
-    # Fetch service request based on req_id for the logged-in professional
-    req_id = session.get('req_id')
-    if not req_id:
-        return jsonify({"error": "Request ID is required"}), 400
-
-    # Query the database
-    service_request = ServiceRequest.query.filter_by(req_id=req_id, prof_id=prof_id).first()
-
-    # Debug output
-    if not service_request:
-        return jsonify({"error": "No service request found with the provided req_id"}), 404
-
-    # Show raw database result for debugging
-    return jsonify({
-        "req_id": service_request.req_id,
-        "user_id": service_request.user_id,
-        "service_id": service_request.service_id,
-        "prof_id": service_request.prof_id,
-        "status": service_request.status,
-        "rating": service_request.rating,
-        "remarks": service_request.remarks,
-        "requested_date": service_request.requested_date.isoformat(),
-        "close_date": service_request.close_date.isoformat()
-    })
 
 

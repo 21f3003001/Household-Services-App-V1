@@ -1,31 +1,18 @@
-{% extends "admin_panel/base.html" %}
+{% extends "user_panel/base.html" %}
 
 {% block content %}
-<div class="container">
-    <!-- Navigation bar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">Welcome to Admin</a>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('main.admin_dashboard') }}">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.summary') }}">Summary</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a></li>
-            </ul>
-        </div>
-    </nav>
 
     <!-- Search Functionality -->
     <div class="mt-4">
         <h3>Search</h3>
-        <form method="GET" action="{{ url_for('admin.search') }}">
+        <form method="GET" action="{{ url_for('customer.search') }}">
             <div class="row mb-3">
                 <div class="col-md-4">
                     <label for="search_by" class="form-label">Search By:</label>
                     <select class="form-select" id="search_by" name="search_by" required>
                         <option value="services">Services</option>
-                        <option value="customers">Customers</option>
                         <option value="professionals">Professionals</option>
-                        <option value="requests">Service Requests</option>
+                        <option value="requests">History</option>
                     </select>
                 </div>
                 <div class="col-md-4">
@@ -110,13 +97,13 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for professional, service_name in results %}
+                        {% for professional in results %}
                         <tr>
                             <td>{{ professional.prof_id }}</td>
                             <td>{{ professional.date_created }}</td>
                             <td>{{ professional.prof_name }}</td>
                             <td>{{ professional.experience }}</td>
-                            <td>{{ service_name }}</td>
+                            <td>{{ professional.name }}</td>
                             <td>{{ professional.address }}</td>
                             <td>{{ professional.pincode }}</td>
                             <td>{{ professional.status }}</td>
