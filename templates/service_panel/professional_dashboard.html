@@ -60,7 +60,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for service in accept %}
+                    {% for service in accepted_services %}
                     <tr>
                         <td>{{ service.req_id }}</td>
                         <td>{{ service.name }}</td>
@@ -95,7 +95,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for service in reject %}
+                    {% for service in rejected_services %}
                     <tr>
                         <td>{{ service.req_id }}</td>
                         <td>{{ service.name }}</td>

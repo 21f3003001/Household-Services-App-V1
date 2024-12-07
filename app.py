@@ -64,7 +64,7 @@ db.init_app(app)
 #Register the blueprint
 app.register_blueprint(main)
 app.register_blueprint(admin_bp)
-app.register_blueprint(customer_bp)
+app.register_blueprint(customer_bp, url_prefix='/customer')
 app.register_blueprint(auth_bp)
 app.register_blueprint(professional_bp)
 

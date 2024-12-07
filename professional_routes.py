@@ -46,16 +46,17 @@ def accept_service(service_id):
 
     # Verify if the logged-in professional is assigned to this service
     professional_id = session.get('prof_id')  # Correct session key for professionals
-    if service_request.prof_id != professional_id:  # Ensure this field matches the model's actual column name
+    if service_request.prof_id != professional_id:  # Ensure it matches the logged-in professional
         flash("You cannot accept this service request.", "danger")
-        return redirect(url_for('professional.professional_dashboard'))
+        return redirect(url_for('main.professional_dashboard'))
 
-    # Update the status to 'Accepted'
+    # Update the status to 'Accepted' for the specific service request
     service_request.status = 'Accepted'
     db.session.commit()
 
     flash("Service request accepted successfully!", "success")
     return redirect(url_for('main.professional_dashboard'))
+
 
 # Route to reject a service request
 @professional_bp.route('/reject/<int:service_id>', methods=['GET'])
@@ -65,17 +66,16 @@ def reject_service(service_id):
 
     # Verify if the logged-in professional is assigned to this service
     professional_id = session.get('prof_id')  # Correct session key for professionals
-    if service_request.prof_id != professional_id:  # Ensure this field matches the model's actual column name
+    if service_request.prof_id != professional_id:  # Ensure it matches the logged-in professional
         flash("You cannot reject this service request.", "danger")
-        return redirect(url_for('professional.professional_dashboard'))
+        return redirect(url_for('main.professional_dashboard'))
 
-    # Update the status to 'Rejected'
+    # Update the status to 'Rejected' for the specific service request
     service_request.status = 'Rejected'
     db.session.commit()
 
     flash("Service request rejected successfully!", "success")
     return redirect(url_for('main.professional_dashboard'))
-
 
 
 # Search functionality route

@@ -1,0 +1,26 @@
+{% extends "admin_panel/base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Search Services</h2>
+    <form action="{{ url_for('admin.search_service') }}" method="GET">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Search by service name" name="query">
+            <button class="btn btn-primary" type="submit">Search</button>
+        </div>
+    </form>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Service Name</th>
+                <th>Description</th>
+                <th>Base Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Populate search results dynamically here -->
+        </tbody>
+    </table>
+</div>
+{% endblock %}

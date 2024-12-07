@@ -323,7 +323,18 @@ def unblock_customer(customer_id):
         flash(f'Error unblocking customer: {str(e)}', 'danger')
     return redirect(url_for('admin.home'))
 
-
+#Delete Customer
+@admin_bp.route('/admin_dashboard/delete_customer/<int:customer_id>')
+def delete_customer(customer_id):
+    customer = User.query.get_or_404(customer_id)
+    try:
+        db.session.delete(customer)
+        db.session.commit()
+        flash('Customer deleted successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error deleting customer: {str(e)}', 'danger')
+    return redirect(url_for('admin.home'))
 
 @admin_bp.route('/approve_professional/<int:professional_id>')
 def approve_professional(professional_id):

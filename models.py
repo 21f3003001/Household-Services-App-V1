@@ -78,17 +78,6 @@ class ServiceProfessional(UserMixin, db.Model):
 #user_id = db.Column(db.Integer, ForeignKey('users.user_id'), nullable=True)
     #service_id = db.Column(db.Integer, ForeignKey('service.service_id'), nullable=True)
 
-class Customer(db.Model):
-    __tablename__ = 'customers'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
-    
-    user = db.relationship('User', backref='customer_profile')
-
-#Customer_dashboard
-#Admin_dashboard
-
 class Service(db.Model):
     __tablename__ = 'service'
     service_id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)

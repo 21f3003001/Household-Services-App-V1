@@ -224,14 +224,3 @@ def profile():
 
     return render_template('user_panel/profile.html', user=user)
 
-
-
-def get_subcategories_for_service(service):
-    # Placeholder function to retrieve subcategories based on service
-    # Replace this with actual database query or logic
-    service_map = {
-        'cleaning': ["General house cleaning", "Deep cleaning", "Carpet cleaning", "Window cleaning"],
-        'plumbing': ["Leak repairs", "Pipe installation", "Drain cleaning", "Water heater repair"],
-        
-    }
-    return service_map.get(service, [])

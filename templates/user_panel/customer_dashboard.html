@@ -4,15 +4,14 @@
 <div class="container">
     <!-- Section for Available Services -->
     <section class="services">
-        <h3>Looking For?</h3>
+        <h3>Explore and Book Services Instantly</h3>
         <div class="row">
             {% for service in services %}
                 <div class="col-md-4 mb-4">
                     <div class="card">
                         <!-- Use the uploaded service image if available; otherwise, use a default image -->
-                        <img src="{{ service.image or url_for('static', filename='uploads/default-service-image.jpg') }}" 
-                             class="card-img-top" alt="{{ service.name }}"
-                             style="max-height: 250px; object-fit: cover;">
+                        <img src="{{ url_for('static', filename=service.image[7:]) if service.image else url_for('static', filename='uploads/default-service-image.jpg') }}"
+                                 class="card-img-top" alt="{{ service.name }}" style="max-height: 250px; object-fit: cover;">
                         <div class="card-body">
                             <h5 class="card-title">{{ service.name }}</h5>
                             <p class="card-text">{{ service.description }}</p>

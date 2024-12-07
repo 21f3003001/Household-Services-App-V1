@@ -1,0 +1,21 @@
+{% extends "admin_panel/base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Summary</h2>
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Overall Customer Ratings</h3>
+            <canvas id="ratingChart"></canvas>
+        </div>
+        <div class="col-md-6">
+            <h3>Service Requests Summary</h3>
+            <canvas id="serviceRequestChart"></canvas>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // JavaScript for rendering charts
+</script>
+{% endblock %}
