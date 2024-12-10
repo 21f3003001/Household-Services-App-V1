@@ -170,6 +170,7 @@
                     <th>Assigned Professional</th>
                     <th>Requested Date</th>
                     <th>Status (Requested/Accepted/Completed)</th>
+                    <th>Remarks</th>
                     <th>Rating</th>
                 </tr>
             </thead>
@@ -180,6 +181,7 @@
                     <td>{{ request.service_professionals.prof_name }}</td>
                     <td>{{ request.requested_date.strftime('%Y-%m-%d') }}</td>
                     <td>{{ request.status }}</td>
+                    <td>{{ request.remarks }}</td>
                     <td>{{ request.rating }}</td>
                 </tr>
                 {% endfor %}
