@@ -7,6 +7,7 @@ from professional_routes import professional_bp
 from customer_routes import customer_bp
 from auth_routes import auth_bp
 from flask_login import LoginManager
+import os
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
